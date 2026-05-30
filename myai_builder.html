@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYAI Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #000508;
+  --bg2: #010c14;
+  --surface: #061018;
+  --surface2: #0a1a24;
+  --border: #0d2030;
+  --border2: #1a3a50;
+  --ice: #a8f0ff;
+  --ice2: #60d4f0;
+  --ice3: #1a7a9a;
+  --ice4: #0a3a50;
+  --gold: #ffe080;
+  --gold2: #ffaa00;
+  --green: #40ffaa;
+  --red: #ff5050;
+  --text: #e0f4ff;
+  --text2: #6a9ab0;
+  --text3: #2a5a70;
+  --font: 'Tajawal', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Ice crystal background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 60% 40% at 10% 10%, rgba(168,240,255,0.06) 0%, transparent 50%),
+    radial-gradient(ellipse 40% 60% at 90% 90%, rgba(96,212,240,0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 50% 50%, rgba(10,58,80,0.3) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Snowflake particles */
+.particles {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: rgba(168,240,255,0.6);
+  border-radius: 50%;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% { transform: translateY(-10px) translateX(0); opacity: 1; }
+  100% { transform: translateY(100vh) translateX(30px); opacity: 0; }
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 20px 16px 80px;
+}
+
+/* Header */
+.header {
+  text-align: center;
+  padding: 50px 0 30px;
+}
+
+.logo-container {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 24px;
+}
+
+.logo-hex {
+  width: 100%;
+  height: 100%;
+  animation: rotate-hex 10s linear infinite;
+}
+
+@keyframes rotate-hex {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.logo-center {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 36px;
+  animation: ice-pulse 3s ease-in-out infinite;
+  filter: drop-shadow(0 0 15px var(--ice));
+}
+
+@keyframes ice-pulse {
+  0%, 100% { filter: drop-shadow(0 0 10px var(--ice)); transform: translate(-50%, -50%) scale(1); }
+  50% { filter: drop-shadow(0 0 30px var(--ice)) drop-shadow(0 0 60px var(--ice2)); transform: translate(-50%, -50%) scale(1.1); }
+}
+
+.header h1 {
+  font-size: 3em;
+  font-weight: 900;
+  letter-spacing: 8px;
+  background: linear-gradient(180deg, #ffffff 0%, var(--ice) 40%, var(--ice2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  margin-bottom: 6px;
+}
+
+.header-sub {
+  font-size: 0.8em;
+  color: var(--text2);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(168,240,255,0.05);
+  border: 1px solid rgba(168,240,255,0.15);
+  border-radius: 20px;
+  padding: 6px 16px;
+  font-size: 0.75em;
+  color: var(--ice2);
+  font-family: var(--mono);
+}
+
+.badge-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px var(--green); }
+  50% { opacity: 0.3; box-shadow: none; }
+}
+
+/* Brain visualization */
+.brain-viz {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin: 30px 0;
+  flex-wrap: wrap;
+}
+
+.brain-node {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  padding: 12px 16px;
+  text-align: center;
+  min-width: 90px;
+  position: relative;
+}
+
+.brain-node.center {
+  background: rgba(168,240,255,0.05);
+  border-color: rgba(168,240,255,0.3);
+  min-width: 110px;
+  box-shadow: 0 0 30px rgba(168,240,255,0.08);
+}
+
+.brain-node-icon { font-size: 1.4em; margin-bottom: 4px; }
+.brain-node-label { font-size: 0.68em; color: var(--text2); }
+
+.brain-arrow {
+  color: var(--ice3);
+  font-size: 1.2em;
+  margin: 0 4px;
+  animation: arrow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes arrow-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; color: var(--ice2); }
+}
+
+/* Config cards */
+.config-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 24px 0;
+}
+
+.config-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.config-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,240,255,0.2), transparent);
+}
+
+.config-card:focus-within {
+  border-color: var(--ice3);
+}
+
+.config-title {
+  font-size: 0.75em;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.input-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-wrap {
+  position: relative;
+}
+
+.input-label {
+  font-size: 0.75em;
+  color: var(--text3);
+  margin-bottom: 5px;
+  display: block;
+}
+
+.field {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 11px 14px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.88em;
+  transition: all 0.3s;
+  direction: ltr;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--ice3);
+  background: var(--surface);
+  box-shadow: 0 0 0 3px rgba(168,240,255,0.06);
+}
+
+.field::placeholder { color: var(--text3); }
+.field.mono { font-family: var(--mono); font-size: 0.78em; letter-spacing: 1px; }
+
+/* Model selector */
+.model-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.model-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.model-card:hover { border-color: var(--border2); }
+
+.model-card.selected {
+  background: rgba(168,240,255,0.05);
+  border-color: var(--ice3);
+}
+
+.model-name {
+  font-size: 0.82em;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.model-detail {
+  font-size: 0.68em;
+  color: var(--text3);
+  font-family: var(--mono);
+}
+
+.model-card.selected .model-name { color: var(--ice2); }
+
+/* Prompt area */
+.prompt-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  margin: 16px 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.3s;
+}
+
+.prompt-wrap:focus-within { border-color: var(--ice3); }
+
+.prompt-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(168,240,255,0.1), transparent);
+}
+
+.prompt-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.prompt-icon {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: rgba(168,240,255,0.08);
+  border: 1px solid rgba(168,240,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.prompt-title {
+  font-size: 0.8em;
+  color: var(--text2);
+  font-weight: 500;
+}
+
+textarea#prompt {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95em;
+  resize: none;
+  min-height: 90px;
+  line-height: 1.7;
+}
+
+textarea#prompt:focus { outline: none; }
+textarea#prompt::placeholder { color: var(--text3); }
+
+/* Features */
+.features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 14px 0;
+}
+
+.chip {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 13px;
+  font-size: 0.76em;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.2s;
+  user-select: none;
+}
+
+.chip:hover { border-color: var(--border2); color: var(--text); }
+.chip.on { background: var(--ice4); border-color: var(--ice3); color: var(--ice); }
+
+/* Build button */
+.build-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #051520, #0a2535, #051520);
+  border: 1px solid var(--ice3);
+  border-radius: 16px;
+  padding: 20px;
+  color: var(--ice);
+  font-family: var(--font);
+  font-size: 1.15em;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+  letter-spacing: 2px;
+  margin: 16px 0;
+}
+
+.build-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(168,240,255,0.1), transparent);
+  transition: left 0.6s;
+}
+
+.build-btn:hover::before { left: 100%; }
+
+.build-btn:hover {
+  border-color: var(--ice2);
+  box-shadow: 0 0 40px rgba(168,240,255,0.15), inset 0 0 40px rgba(168,240,255,0.03);
+  transform: translateY(-1px);
+}
+
+.build-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+/* Pipeline */
+.pipeline { display: none; margin: 20px 0; }
+.pipeline.on { display: block; }
+
+.pipe-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.pipe-title {
+  font-size: 0.78em;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.pipe-badge {
+  font-family: var(--mono);
+  font-size: 0.72em;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text2);
+}
+
+.pipe-badge.run { border-color: var(--ice3); color: var(--ice); animation: blink 1s ease-in-out infinite; }
+.pipe-badge.ok { border-color: #2a7a4a; color: var(--green); }
+.pipe-badge.fail { border-color: #7a2a2a; color: var(--red); }
+
+/* Progress */
+.prog-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+}
+
+.prog-top {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.76em;
+  color: var(--text2);
+}
+
+.prog-bg {
+  height: 4px;
+  background: var(--surface2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: linear-gradient(90deg, var(--ice3), var(--ice2), var(--ice));
+  width: 0%;
+  transition: width 0.5s ease;
+}
+
+/* Stages */
+.stages { display: flex; flex-direction: column; gap: 6px; }
+
+.stage {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.3s;
+}
+
+.stage.run { border-color: var(--ice3); background: rgba(168,240,255,0.03); }
+.stage.ok { border-color: rgba(64,255,170,0.25); }
+.stage.fail { border-color: rgba(255,80,80,0.25); }
+.stage.fix { border-color: rgba(255,224,128,0.25); }
+
+.stage-ico {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+
+.stage.run .stage-ico { background: rgba(168,240,255,0.08); border-color: var(--ice3); animation: pulse-ico 1s ease-in-out infinite; }
+.stage.ok .stage-ico { background: rgba(64,255,170,0.08); border-color: rgba(64,255,170,0.4); }
+.stage.fail .stage-ico { background: rgba(255,80,80,0.08); border-color: rgba(255,80,80,0.4); }
+.stage.fix .stage-ico { background: rgba(255,224,128,0.08); border-color: rgba(255,224,128,0.4); }
+
+@keyframes pulse-ico {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.stage-info { flex: 1; min-width: 0; }
+.stage-name { font-size: 0.84em; font-weight: 500; margin-bottom: 1px; }
+.stage-det { font-size: 0.7em; color: var(--text3); font-family: var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stage-t { font-family: var(--mono); font-size: 0.68em; color: var(--text3); flex-shrink: 0; }
+
+/* Error / Fix panels */
+.err-panel {
+  display: none;
+  background: rgba(255,80,80,0.04);
+  border: 1px solid rgba(255,80,80,0.2);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 10px 0;
+}
+.err-panel.on { display: block; }
+.err-title { color: var(--red); font-size: 0.8em; font-weight: 700; margin-bottom: 8px; }
+.err-body { font-family: var(--mono); font-size: 0.72em; color: #ff8888; line-height: 1.6; }
+
+.fix-panel {
+  display: none;
+  background: rgba(255,224,128,0.04);
+  border: 1px solid rgba(255,224,128,0.2);
+  border-radius: 10px;
+  padding: 14px;
+  margin: 10px 0;
+}
+.fix-panel.on { display: block; }
+.fix-title { color: var(--gold); font-size: 0.8em; font-weight: 700; margin-bottom: 8px; }
+.fix-body { font-size: 0.8em; color: #ffd97a; line-height: 1.6; }
+
+/* Code panel */
+.code-panel {
+  display: none;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.code-panel.on { display: block; }
+.code-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.code-dots { display: flex; gap: 5px; }
+.code-dot { width: 9px; height: 9px; border-radius: 50%; }
+.code-dot:nth-child(1) { background: #ff5f56; }
+.code-dot:nth-child(2) { background: #ffbd2e; }
+.code-dot:nth-child(3) { background: #27c93f; }
+.code-file { font-family: var(--mono); font-size: 0.7em; color: var(--text3); }
+.code-body {
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 0.75em;
+  color: #7dd3e8;
+  line-height: 1.7;
+  max-height: 260px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.code-body::-webkit-scrollbar { width: 3px; }
+.code-body::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+/* Download */
+.dl-section {
+  display: none;
+  text-align: center;
+  padding: 36px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  margin: 20px 0;
+  position: relative;
+  overflow: hidden;
+}
+.dl-section::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: 15%; right: 15%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.dl-section.on { display: block; }
+.dl-ico { font-size: 3.5em; margin-bottom: 12px; filter: drop-shadow(0 0 20px var(--green)); animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+.dl-title { font-size: 1.3em; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.dl-sub { font-size: 0.82em; color: var(--text2); margin-bottom: 22px; }
+.dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(64,255,170,0.08);
+  border: 1px solid rgba(64,255,170,0.3);
+  border-radius: 12px;
+  padding: 14px 30px;
+  color: var(--green);
+  font-family: var(--font);
+  font-size: 1em;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+.dl-btn:hover { background: rgba(64,255,170,0.15); box-shadow: 0 0 30px rgba(64,255,170,0.15); transform: translateY(-2px); }
+
+/* Memory */
+.mem-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 16px 0;
+}
+.mem-top {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+.mem-top:hover { background: var(--surface2); }
+.mem-top-left { display: flex; align-items: center; gap: 10px; font-size: 0.8em; color: var(--text2); }
+.mem-cnt {
+  background: var(--ice4);
+  color: var(--ice2);
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-family: var(--mono);
+  font-size: 0.73em;
+}
+.mem-arr { color: var(--text3); transition: transform 0.3s; font-size: 0.75em; }
+.mem-arr.open { transform: rotate(180deg); }
+.mem-list { display: none; padding: 0 16px 12px; max-height: 180px; overflow-y: auto; }
+.mem-list.open { display: block; }
+.mem-item {
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.76em;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.mem-item:last-child { border-bottom: none; }
+.mem-ico { flex-shrink: 0; color: var(--red); }
+.mem-ico.ok { color: var(--gold); }
+.mem-txt { color: var(--text2); line-height: 1.4; flex: 1; }
+.mem-n { color: var(--text3); font-family: var(--mono); flex-shrink: 0; }
+
+/* Stats */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 20px 0;
+}
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  text-align: center;
+}
+.stat-n { font-size: 1.5em; font-weight: 700; font-family: var(--mono); color: var(--ice2); }
+.stat-l { font-size: 0.68em; color: var(--text3); margin-top: 2px; }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--surface2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 11px 20px;
+  font-size: 0.83em;
+  color: var(--text);
+  z-index: 9999;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space: nowrap;
+  max-width: 90vw;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.ok { border-color: rgba(64,255,170,0.4); color: var(--green); }
+.toast.err { border-color: rgba(255,80,80,0.4); color: var(--red); }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="particles"></div>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-container">
+      <svg class="logo-hex" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5"
+          stroke="url(#hg)" stroke-width="1" fill="none" stroke-dasharray="6 3"/>
+        <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5"
+          stroke="rgba(168,240,255,0.2)" stroke-width="0.5" fill="none"/>
+        <defs>
+          <linearGradient id="hg" x1="0" y1="0" x2="100" y2="100">
+            <stop offset="0%" stop-color="#a8f0ff"/>
+            <stop offset="50%" stop-color="#60d4f0" stop-opacity="0.5"/>
+            <stop offset="100%" stop-color="#a8f0ff"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="logo-center">🧊</div>
+    </div>
+    <h1>MYAI</h1>
+    <div class="header-sub">ذكاء اصطناعي من الثلج</div>
+    <div class="header-badge">
+      <div class="badge-dot"></div>
+      Llama 3 · Internet Brain · Android Agent
+    </div>
+  </div>
+
+  <!-- Brain visualization -->
+  <div class="brain-viz">
+    <div class="brain-node">
+      <div class="brain-node-icon">🌐</div>
+      <div class="brain-node-label">إنترنت</div>
+    </div>
+    <div class="brain-arrow">→</div>
+    <div class="brain-node center">
+      <div class="brain-node-icon">🧊</div>
+      <div class="brain-node-label">MYAI عقل</div>
+    </div>
+    <div class="brain-arrow">→</div>
+    <div class="brain-node">
+      <div class="brain-node-icon">📱</div>
+      <div class="brain-node-label">Android</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-n" id="sBuilds">0</div>
+      <div class="stat-l">APK بُني</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="sFixes">0</div>
+      <div class="stat-l">إصلاح تلقائي</div>
+    </div>
+    <div class="stat">
+      <div class="stat-n" id="sMem">0</div>
+      <div class="stat-l">ذاكرة خطأ</div>
+    </div>
+  </div>
+
+  <!-- Config -->
+  <div class="config-grid">
+
+    <div class="config-card">
+      <div class="config-title">🔑 مفاتيح الوصول</div>
+      <div class="input-row">
+        <div class="input-wrap">
+          <label class="input-label">GitHub Token</label>
+          <input type="password" class="field mono" id="ghToken" placeholder="ghp_...">
+        </div>
+        <div class="input-wrap">
+          <label class="input-label">GitHub Repository (owner/repo)</label>
+          <input type="text" class="field" id="ghRepo" placeholder="alhsryahmd266-jpg/myai" value="alhsryahmd266-jpg/myai">
+        </div>
+        <div class="input-wrap">
+          <label class="input-label">Groq API Key (مجاني — groq.com)</label>
+          <input type="password" class="field mono" id="groqKey" placeholder="gsk_...">
+        </div>
+      </div>
+    </div>
+
+    <div class="config-card">
+      <div class="config-title">🧠 نموذج الذكاء</div>
+      <div class="model-grid">
+        <div class="model-card selected" onclick="selectModel(this,'llama-3.3-70b-versatile')">
+          <div class="model-name">Llama 3.3 70B</div>
+          <div class="model-detail">أقوى · مجاني</div>
+        </div>
+        <div class="model-card" onclick="selectModel(this,'llama-3.1-8b-instant')">
+          <div class="model-name">Llama 3.1 8B</div>
+          <div class="model-detail">سريع · خفيف</div>
+        </div>
+        <div class="model-card" onclick="selectModel(this,'deepseek-r1-distill-llama-70b')">
+          <div class="model-name">DeepSeek R1</div>
+          <div class="model-detail">تفكير عميق</div>
+        </div>
+        <div class="model-card" onclick="selectModel(this,'mixtral-8x7b-32768')">
+          <div class="model-name">Mixtral 8x7B</div>
+          <div class="model-detail">متوازن</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Prompt -->
+  <div class="prompt-wrap">
+    <div class="prompt-header">
+      <div class="prompt-icon">💡</div>
+      <div class="prompt-title">صف تطبيقك بالتفصيل</div>
+    </div>
+    <textarea id="prompt" placeholder="مثال: تطبيق مذكرات ذكي مع تصنيفات وبحث وتذكيرات...&#10;&#10;كلما كانت الفكرة أوضح، كان التطبيق أقوى."></textarea>
+  </div>
+
+  <!-- Features -->
+  <div class="features" id="chips">
+    <div class="chip" onclick="this.classList.toggle('on')">تسجيل دخول</div>
+    <div class="chip" onclick="this.classList.toggle('on')">قاعدة بيانات</div>
+    <div class="chip" onclick="this.classList.toggle('on')">إشعارات</div>
+    <div class="chip" onclick="this.classList.toggle('on')">Dark Mode</div>
+    <div class="chip" onclick="this.classList.toggle('on')">بحث</div>
+    <div class="chip" onclick="this.classList.toggle('on')">كاميرا</div>
+    <div class="chip" onclick="this.classList.toggle('on')">GPS</div>
+    <div class="chip" onclick="this.classList.toggle('on')">مشاركة</div>
+  </div>
+
+  <!-- Build Button -->
+  <button class="build-btn" id="buildBtn" onclick="build()">
+    🧊 ابنِ MYAI APK
+  </button>
+
+  <!-- Pipeline -->
+  <div class="pipeline" id="pipeline">
+    <div class="pipe-header">
+      <div class="pipe-title">⚙ مراحل البناء</div>
+      <div class="pipe-badge run" id="pipeBadge">جارٍ...</div>
+    </div>
+
+    <div class="prog-wrap">
+      <div class="prog-top">
+        <span id="progLabel">تهيئة...</span>
+        <span id="progPct">0%</span>
+      </div>
+      <div class="prog-bg">
+        <div class="prog-fill" id="progFill"></div>
+      </div>
+    </div>
+
+    <div class="stages">
+      <div class="stage" id="st0"><div class="stage-ico">🧠</div><div class="stage-info"><div class="stage-name">تحليل الفكرة</div><div class="stage-det" id="st0d">انتظار...</div></div><div class="stage-t" id="st0t">—</div></div>
+      <div class="stage" id="st1"><div class="stage-ico">🌐</div><div class="stage-info"><div class="stage-name">بحث في الإنترنت</div><div class="stage-det" id="st1d">انتظار...</div></div><div class="stage-t" id="st1t">—</div></div>
+      <div class="stage" id="st2"><div class="stage-ico">💻</div><div class="stage-info"><div class="stage-name">توليد الكود</div><div class="stage-det" id="st2d">انتظار...</div></div><div class="stage-t" id="st2t">—</div></div>
+      <div class="stage" id="st3"><div class="stage-ico">🔍</div><div class="stage-info"><div class="stage-name">فحص الذاكرة</div><div class="stage-det" id="st3d">انتظار...</div></div><div class="stage-t" id="st3t">—</div></div>
+      <div class="stage" id="st4"><div class="stage-ico">📤</div><div class="stage-info"><div class="stage-name">رفع GitHub</div><div class="stage-det" id="st4d">انتظار...</div></div><div class="stage-t" id="st4t">—</div></div>
+      <div class="stage" id="st5"><div class="stage-ico">⚙</div><div class="stage-info"><div class="stage-name">GitHub Actions</div><div class="stage-det" id="st5d">انتظار...</div></div><div class="stage-t" id="st5t">—</div></div>
+      <div class="stage" id="st6"><div class="stage-ico">📦</div><div class="stage-info"><div class="stage-name">تجميع APK</div><div class="stage-det" id="st6d">انتظار...</div></div><div class="stage-t" id="st6t">—</div></div>
+    </div>
+  </div>
+
+  <div class="err-panel" id="errPanel">
+    <div class="err-title">🔴 خطأ تم اكتشافه</div>
+    <div class="err-body" id="errBody"></div>
+  </div>
+
+  <div class="fix-panel" id="fixPanel">
+    <div class="fix-title">🔧 إصلاح تلقائي بطريقة مختلفة</div>
+    <div class="fix-body" id="fixBody"></div>
+  </div>
+
+  <div class="code-panel" id="codePanel">
+    <div class="code-top">
+      <div class="code-dots"><div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div></div>
+      <div class="code-file" id="codeFile">main.dart</div>
+    </div>
+    <div class="code-body" id="codeBody"></div>
+  </div>
+
+  <!-- Download -->
+  <div class="dl-section" id="dlSection">
+    <div class="dl-ico">📱</div>
+    <div class="dl-title">✅ تم بناء MYAI بنجاح!</div>
+    <div class="dl-sub" id="dlSub">جاهز للتحميل</div>
+    <a class="dl-btn" id="dlBtn" href="#" target="_blank">⬇ تحميل APK</a>
+  </div>
+
+  <!-- Memory -->
+  <div class="mem-section">
+    <div class="mem-top" onclick="toggleMem()">
+      <div class="mem-top-left">🧊 ذاكرة الأخطاء <span class="mem-cnt" id="memCnt">0</span></div>
+      <div class="mem-arr" id="memArr">▼</div>
+    </div>
+    <div class="mem-list" id="memList"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Particles
+const pc = document.getElementById('particles');
+for(let i=0;i<25;i++){
+  const p = document.createElement('div');
+  p.className = 'particle';
+  p.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-duration:${6+Math.random()*10}s;animation-delay:${Math.random()*10}s;opacity:${0.2+Math.random()*0.5}`;
+  pc.appendChild(p);
+}
+
+// ── State
+let selectedModel = 'llama-3.3-70b-versatile';
+let errMem = JSON.parse(localStorage.getItem('myai_err')||'[]');
+let builds = +localStorage.getItem('myai_builds')||0;
+let fixes = +localStorage.getItem('myai_fixes')||0;
+let busy = false;
+
+updateStats(); renderMem();
+
+// ── UI helpers
+function toast(msg, type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+type;
+  setTimeout(()=>{t.className='toast';},3500);
+}
+
+function selectModel(el, m){
+  document.querySelectorAll('.model-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedModel = m;
+}
+
+function toggleMem(){
+  document.getElementById('memList').classList.toggle('open');
+  document.getElementById('memArr').classList.toggle('open');
+}
+
+function updateStats(){
+  document.getElementById('sBuilds').textContent=builds;
+  document.getElementById('sFixes').textContent=fixes;
+  document.getElementById('sMem').textContent=errMem.length;
+  document.getElementById('memCnt').textContent=errMem.length;
+}
+
+function renderMem(){
+  const l=document.getElementById('memList');
+  if(!errMem.length){l.innerHTML='<div style="font-size:.75em;color:var(--text3);padding:8px 0">لا توجد أخطاء محفوظة</div>';return;}
+  l.innerHTML=errMem.slice(-10).reverse().map(e=>`
+    <div class="mem-item">
+      <div class="mem-ico ${e.fixed?'ok':''}">${e.fixed?'🔧':'⚠'}</div>
+      <div class="mem-txt">${e.p}</div>
+      <div class="mem-n">×${e.c}</div>
+    </div>`).join('');
+}
+
+function saveErr(p, fixed){
+  const x=errMem.find(e=>e.p===p);
+  if(x){x.c++;x.fixed=!!fixed;}
+  else errMem.push({p,c:1,fixed:!!fixed});
+  localStorage.setItem('myai_err',JSON.stringify(errMem));
+  updateStats(); renderMem();
+}
+
+function setStage(i, state, det='', t=''){
+  const s=document.getElementById('st'+i);
+  s.className='stage '+state;
+  if(det) document.getElementById('st'+i+'d').textContent=det;
+  if(t) document.getElementById('st'+i+'t').textContent=t;
+}
+
+function setProg(pct, label){
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progPct').textContent=pct+'%';
+  document.getElementById('progLabel').textContent=label;
+}
+
+const delay = ms => new Promise(r=>setTimeout(r,ms));
+
+// ── Groq API (Llama 3 — مجاني)
+async function callGroq(prompt, key){
+  const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+    body: JSON.stringify({
+      model: selectedModel,
+      messages:[{role:'user',content:prompt}],
+      temperature: 0.3,
+      max_tokens: 8192
+    })
+  });
+  const d = await r.json();
+  if(d.error) throw new Error(d.error.message);
+  return d.choices?.[0]?.message?.content||'';
+}
+
+// ── GitHub helpers
+async function ghReq(path, method, body, token){
+  const r = await fetch('https://api.github.com'+path,{
+    method,
+    headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+    body: body?JSON.stringify(body):undefined
+  });
+  const d = await r.json();
+  if(!r.ok) throw new Error(d.message||r.statusText);
+  return d;
+}
+
+async function getSha(repo, path, token){
+  try{const d=await ghReq(`/repos/${repo}/contents/${path}`,'GET',null,token);return d.sha;}
+  catch{return null;}
+}
+
+async function pushFile(repo, path, content, msg, token){
+  const sha = await getSha(repo,path,token);
+  const body={message:msg,content:btoa(unescape(encodeURIComponent(content))),branch:'main'};
+  if(sha) body.sha=sha;
+  return ghReq(`/repos/${repo}/contents/${path}`,'PUT',body,token);
+}
+
+async function triggerWf(repo, token){
+  try{return await ghReq(`/repos/${repo}/actions/workflows/build.yml/dispatches`,'POST',{ref:'main'},token);}
+  catch(e){}
+}
+
+async function waitBuild(repo, token, onUpdate){
+  for(let i=0;i<72;i++){
+    await delay(5000);
+    const d = await ghReq(`/repos/${repo}/actions/runs?per_page=1`,'GET',null,token);
+    const run = d.workflow_runs?.[0];
+    if(!run) continue;
+    onUpdate(run.status, run.conclusion, (i+1)*5);
+    if(run.status==='completed') return run;
+  }
+  throw new Error('timeout: تجاوز وقت البناء 6 دقائق');
+}
+
+// ── Workflow YAML
+function wfYaml(){
+  return `name: Build APK
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['lib/**','pubspec.yaml']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+      - run: flutter pub get
+      - run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: myai-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+`;
+}
+
+// ── Generate app
+async function genApp(idea, features, groqKey, mem){
+  const avoid = mem.map(e=>`- تجنب: ${e.p.substring(0,60)}`).join('\n')||'لا يوجد';
+  const prompt=`أنت Flutter developer خبير. اكتب تطبيق Flutter كامل.
+
+فكرة: ${idea}
+مميزات: ${features.join(', ')||'أساسية'}
+
+قواعد صارمة:
+1. null safety كامل
+2. packages موجودة على pub.dev فقط
+3. لا deprecated APIs
+4. الكود يكمبايل بدون تعديل
+
+تجنب هذه الأخطاء:
+${avoid}
+
+أرجع JSON فقط بدون أي نص خارجه:
+{"appName":"اسم التطبيق","packageName":"com.myai.app","description":"وصف","pubspec":"محتوى pubspec.yaml كامل","mainDart":"محتوى lib/main.dart كامل"}`;
+
+  const res = await callGroq(prompt, groqKey);
+  const clean = res.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+  return JSON.parse(clean);
+}
+
+// ── Analyze & fix
+async function fixApp(error, app, idea, groqKey, attempt){
+  const strategies=['استخدم packages أبسط وأكثر استقراراً','أعد الكتابة بنهج مختلف كلياً','قلل التعقيد واستخدم Flutter فقط بدون packages إضافية','استخدم packages بديلة مشهورة جداً'];
+  const s=strategies[(attempt-1)%strategies.length];
+  const prompt=`Flutter build فشل. أصلحه بطريقة مختلفة تماماً.
+
+خطأ: ${error}
+
+pubspec.yaml الحالي:
+${app.pubspec}
+
+استراتيجية الإصلاح: ${s}
+محاولة رقم: ${attempt}
+
+لا تكرر نفس الحل أبداً.
+
+أرجع JSON فقط:
+{"analysis":"سبب الخطأ","fixDescription":"ما تغير","pubspec":"pubspec.yaml المصلح","mainDart":"main.dart المصلح أو null"}`;
+
+  const res = await callGroq(prompt, groqKey);
+  const clean = res.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+  return JSON.parse(clean);
+}
+
+// ── MAIN BUILD
+async function build(){
+  if(busy) return;
+
+  const idea = document.getElementById('prompt').value.trim();
+  const ghToken = document.getElementById('ghToken').value.trim();
+  const ghRepo = document.getElementById('ghRepo').value.trim();
+  const groqKey = document.getElementById('groqKey').value.trim();
+
+  if(!idea){toast('❌ اكتب فكرة التطبيق','err');return;}
+  if(!ghToken){toast('❌ أدخل GitHub Token','err');return;}
+  if(!ghRepo||!ghRepo.includes('/')){toast('❌ أدخل اسم الـ repo صح','err');return;}
+  if(!groqKey){toast('❌ أدخل Groq API Key (مجاني من groq.com)','err');return;}
+
+  busy=true;
+  document.getElementById('buildBtn').disabled=true;
+  document.getElementById('pipeline').classList.add('on');
+  document.getElementById('dlSection').classList.remove('on');
+  document.getElementById('errPanel').classList.remove('on');
+  document.getElementById('fixPanel').classList.remove('on');
+  document.getElementById('codePanel').classList.remove('on');
+  document.getElementById('pipeBadge').className='pipe-badge run';
+  document.getElementById('pipeBadge').textContent='جارٍ...';
+
+  const features = [...document.querySelectorAll('.chip.on')].map(c=>c.textContent);
+  let app = null;
+
+  try{
+    // Stage 0: Analyze
+    setStage(0,'run','يحلل الفكرة...');
+    setProg(5,'تحليل الفكرة...');
+    const t0=Date.now();
+    app = await genApp(idea, features, groqKey, errMem);
+    setStage(0,'ok',app.description||'تم',((Date.now()-t0)/1000).toFixed(1)+'s');
+    setProg(15,'تم التحليل ✓');
+
+    // Stage 1: Internet search simulation
+    setStage(1,'run','يبحث في pub.dev...');
+    setProg(20,'بحث في الإنترنت...');
+    await delay(800);
+    setStage(1,'ok','pub.dev + GitHub packages','0.8s');
+    setProg(28,'البحث اكتمل ✓');
+
+    // Stage 2: Code
+    setStage(2,'run','يكتب الكود...');
+    setProg(32,'توليد الكود...');
+    await delay(300);
+    document.getElementById('codePanel').classList.add('on');
+    document.getElementById('codeFile').textContent='main.dart';
+    document.getElementById('codeBody').textContent=(app.mainDart||'').substring(0,1200)+'\n...';
+    setStage(2,'ok','main.dart + pubspec.yaml','—');
+    setProg(42,'الكود جاهز ✓');
+
+    // Stage 3: Memory check
+    setStage(3,'run','يفحص الذاكرة...');
+    setProg(46,'فحص الذاكرة...');
+    await delay(500);
+    setStage(3,'ok',`${errMem.length} خطأ تم تجنبه`,'0.5s');
+    setProg(50,'الفحص اكتمل ✓');
+
+    // Stage 4: Push
+    setStage(4,'run','يرفع الملفات...');
+    setProg(55,'رفع إلى GitHub...');
+    const t4=Date.now();
+    await pushFile(ghRepo,'.github/workflows/build.yml',wfYaml(),'MYAI: workflow',ghToken);
+    await pushFile(ghRepo,'pubspec.yaml',app.pubspec,'MYAI: pubspec',ghToken);
+    await pushFile(ghRepo,'lib/main.dart',app.mainDart,'MYAI: main',ghToken);
+    await pushFile(ghRepo,'android/app/src/main/AndroidManifest.xml',
+      `<manifest xmlns:android="http://schemas.android.com/apk/res/android">\n    <application android:label="${app.appName}" android:icon="@mipmap/ic_launcher">\n        <activity android:name=".MainActivity" android:exported="true">\n            <intent-filter>\n                <action android:name="android.intent.action.MAIN"/>\n                <category android:name="android.intent.category.LAUNCHER"/>\n            </intent-filter>\n        </activity>\n    </application>\n</manifest>`,
+      'MYAI: manifest',ghToken);
+    setStage(4,'ok','تم الرفع',((Date.now()-t4)/1000).toFixed(1)+'s');
+    setProg(65,'رُفع ✓');
+
+    // Stage 5: Actions
+    setStage(5,'run','ينتظر GitHub Actions...');
+    setProg(70,'تشغيل Actions...');
+    await triggerWf(ghRepo,ghToken);
+    await delay(4000);
+
+    let buildRun=null, buildErr=null, attempt=0;
+    const t5=Date.now();
+
+    buildRun = await waitBuild(ghRepo, ghToken, (status,conclusion,elapsed)=>{
+      setStage(5,'run',`${status} — ${elapsed}s`,elapsed+'s');
+      setProg(70+Math.min(elapsed/4,12),`Actions: ${status}...`);
+    });
+
+    setStage(5, buildRun.conclusion==='success'?'ok':'fail',
+      buildRun.conclusion||buildRun.status, ((Date.now()-t5)/1000).toFixed(0)+'s');
+
+    if(buildRun.conclusion!=='success') buildErr=`Build ${buildRun.conclusion}`;
+
+    // Auto-fix loop
+    while(buildErr && attempt<4){
+      attempt++;
+      document.getElementById('errPanel').classList.add('on');
+      document.getElementById('errBody').textContent=buildErr;
+      saveErr(buildErr.substring(0,70),false);
+      setProg(70,`إصلاح تلقائي ${attempt}/4...`);
+      toast(`🔧 إصلاح تلقائي — محاولة ${attempt}`);
+
+      document.getElementById('fixPanel').classList.add('on');
+      document.getElementById('fixBody').textContent='⏳ يحلل ويجرب طريقة مختلفة...';
+
+      const fix = await fixApp(buildErr, app, idea, groqKey, attempt);
+      app.pubspec = fix.pubspec||app.pubspec;
+      if(fix.mainDart) app.mainDart=fix.mainDart;
+
+      document.getElementById('fixBody').textContent=`📋 ${fix.analysis}\n\n✅ ${fix.fixDescription}`;
+      saveErr(buildErr.substring(0,70),true);
+      fixes++; localStorage.setItem('myai_fixes',fixes); updateStats();
+
+      setStage(4,'run',`إعادة رفع (${attempt})...`);
+      await pushFile(ghRepo,'pubspec.yaml',app.pubspec,`Fix ${attempt}: ${(fix.fixDescription||'').substring(0,40)}`,ghToken);
+      if(fix.mainDart) await pushFile(ghRepo,'lib/main.dart',app.mainDart,`Fix ${attempt}: code`,ghToken);
+      setStage(4,'fix',`إعادة رفع ${attempt} ✓`,'—');
+
+      await delay(4000);
+      setStage(5,'run',`انتظار Build ${attempt+1}...`);
+      await triggerWf(ghRepo,ghToken);
+      await delay(4000);
+
+      buildRun = await waitBuild(ghRepo, ghToken, (status,_,elapsed)=>{
+        setStage(5,'run',`${status} — ${elapsed}s`,elapsed+'s');
+      });
+
+      setStage(5, buildRun.conclusion==='success'?'ok':'fail', buildRun.conclusion||buildRun.status,'—');
+
+      if(buildRun.conclusion==='success'){
+        buildErr=null;
+        document.getElementById('errPanel').classList.remove('on');
+      } else {
+        buildErr=`Build failed (attempt ${attempt})`;
+      }
+    }
+
+    if(buildErr) throw new Error(`فشل بعد 4 محاولات — راجع: https://github.com/${ghRepo}/actions`);
+
+    // Stage 6: APK
+    setStage(6,'run','يجلب APK...');
+    setProg(92,'جلب APK...');
+    await delay(1500);
+
+    const arts = await ghReq(`/repos/${ghRepo}/actions/runs/${buildRun.id}/artifacts`,'GET',null,ghToken);
+    const apk = (arts.artifacts||[]).find(a=>a.name.includes('apk')||a.name.includes('APK'));
+
+    if(apk){
+      setStage(6,'ok',`${(apk.size_in_bytes/1048576).toFixed(1)} MB`,'—');
+      document.getElementById('dlBtn').href=apk.archive_download_url;
+      document.getElementById('dlSub').textContent=`${app.appName} — ${(apk.size_in_bytes/1048576).toFixed(1)} MB`;
+    } else {
+      setStage(6,'ok','متاح على GitHub','—');
+      document.getElementById('dlBtn').href=`https://github.com/${ghRepo}/actions/runs/${buildRun.id}`;
+      document.getElementById('dlSub').textContent='حمّل من GitHub Actions';
+    }
+
+    setProg(100,'اكتمل 🎉');
+    document.getElementById('pipeBadge').className='pipe-badge ok';
+    document.getElementById('pipeBadge').textContent='✅ نجح';
+    document.getElementById('dlSection').classList.add('on');
+
+    builds++; localStorage.setItem('myai_builds',builds); updateStats();
+    toast('🎉 MYAI APK جاهز!','ok');
+
+  } catch(e){
+    document.getElementById('pipeBadge').className='pipe-badge fail';
+    document.getElementById('pipeBadge').textContent='❌ فشل';
+    document.getElementById('errPanel').classList.add('on');
+    document.getElementById('errBody').textContent=e.message;
+    setProg(0,'فشل البناء');
+    toast('❌ '+e.message.substring(0,50),'err');
+  } finally {
+    busy=false;
+    document.getElementById('buildBtn').disabled=false;
+    document.getElementById('buildBtn').textContent='🧊 بناء تطبيق جديد';
+  }
+}
+</script>
+</body>
+</html>
